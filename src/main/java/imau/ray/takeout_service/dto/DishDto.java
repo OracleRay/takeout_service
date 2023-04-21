@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * DTO£¬ÓÃÓÚÕ¹Ê¾²ãÓë·şÎñ²ãÖ®¼äµÄÊı¾İ´«Êä
+ * DTOï¼Œç”¨äºå±•ç¤ºå±‚ä¸æœåŠ¡å±‚ä¹‹é—´çš„æ•°æ®ä¼ è¾“
  */
 @Data
 public class DishDto extends Dish {

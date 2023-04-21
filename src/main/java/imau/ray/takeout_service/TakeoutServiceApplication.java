@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 @EnableCaching      //开启spring cache
 public class TakeoutServiceApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(TakeoutServiceApplication.class, args);
         log.info("项目启动成功！");

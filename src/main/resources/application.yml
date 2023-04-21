@@ -16,7 +16,7 @@ spring:
         database: 0
     cache:
         redis:
-            time-to-live: 1800000 #设置缓存的过期时间
+            time-to-live: 1800000  #设置缓存的过期时间
 mybatis-plus:
     configuration:
         # 映射实体时，下划线命名和驼峰命名对应
