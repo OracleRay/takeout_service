@@ -16,14 +16,13 @@ spring:
         database: 0
     cache:
         redis:
-            time-to-live: 1800000  #设置缓存的过期时间
+            time-to-live: 1800000
 mybatis-plus:
     configuration:
-        # 映射实体时，下划线命名和驼峰命名对应
         map-underscore-to-camel-case: true
         log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
     global-config:
         db-config:
             id-type: ASSIGN_ID
 ray:
-    path: R:\img\
+    path: /home/ray/鍥剧墖
