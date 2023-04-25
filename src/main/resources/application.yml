@@ -25,4 +25,4 @@ mybatis-plus:
         db-config:
             id-type: ASSIGN_ID
 ray:
-    path: /home/ray/图片
+    path: /home/ray/图片/
