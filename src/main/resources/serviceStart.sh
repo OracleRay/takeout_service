@@ -33,6 +33,6 @@ output=`mvn clean package -Dmaven.test.skip=true`
 cd target
 
 echo 启动项目
-nohup java -jar takeout_service-1.0-SNAPSHOT.jar &> imau_take_out.log &
+nohup java -jar takeout_service-0.0.1-SNAPSHOT.jar &> imau_take_out.log &
 echo 项目启动完成
 
