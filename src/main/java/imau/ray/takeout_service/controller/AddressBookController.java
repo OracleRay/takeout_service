@@ -125,7 +125,7 @@ public class AddressBookController {
      * @return
      */
     @DeleteMapping
-    public R<String> delete(@RequestParam("id") Long id){
+    public R<String> delete(@RequestParam("ids") Long id){
         if(id==null){
             return R.error("请求异常");
         }
