@@ -4,10 +4,14 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import imau.ray.takeout_service.common.R;
+import imau.ray.takeout_service.dto.DishDto;
 import imau.ray.takeout_service.dto.SetmealDto;
 import imau.ray.takeout_service.entity.Category;
+import imau.ray.takeout_service.entity.Dish;
 import imau.ray.takeout_service.entity.Setmeal;
+import imau.ray.takeout_service.entity.SetmealDish;
 import imau.ray.takeout_service.service.CategoryService;
+import imau.ray.takeout_service.service.DishService;
 import imau.ray.takeout_service.service.SetmealDishService;
 import imau.ray.takeout_service.service.SetmealService;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +40,9 @@ public class SetmealController {
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private DishService dishService;
 
     /**
      * 新增套餐
@@ -136,18 +143,83 @@ public class SetmealController {
     }
 
     /**
-     * 启售和停售套餐
-     * @param id
+     * 修改套餐状态
+     * @param status
+     * @param ids
+     */
+    @PostMapping("/status/{status}")
+    public R<String> status(@PathVariable Integer status, @RequestParam  List<Long> ids) {
+        Setmeal setmeal = new Setmeal();
+        for (Long dishId : ids) {
+            setmeal.setId(dishId);
+            setmeal.setStatus(status);
+            setmealService.updateById(setmeal);
+        }
+        return R.success("修改成功");
+    }
+
+    /**
+     * 回显套餐数据：根据套餐id查询套餐
      * @return
      */
-    @PostMapping("/0")
-    public R<String> setStatus(@RequestParam Long id) {
-        //查询套餐状态
-//        Setmeal setmeal = setmealService.getById(id);
-//        LambdaQueryWrapper<Setmeal> queryWrapper = new LambdaQueryWrapper<>();
-//        queryWrapper.eq(null != setmeal.getStatus(), Setmeal::getStatus, setmeal.getStatus());
-//        log.info("setmeal:{}", queryWrapper);
+    @GetMapping("/{id}")
+    public R<SetmealDto> getData(@PathVariable Long id){
+        SetmealDto setmealDto = setmealService.getDate(id);
 
-        return null;
+        return R.success(setmealDto);
+    }
+
+    /**
+     * 修改套餐内容
+     * @param setmealDto
+     * @return
+     */
+    @CacheEvict(value = "setmealCache",allEntries = true)
+    @PutMapping
+    public R<String> edit(@RequestBody SetmealDto setmealDto){
+
+        if (setmealDto==null){
+            return R.error("请求异常");
+        }
+
+        if (setmealDto.getSetmealDishes()==null){
+            return R.error("套餐没有菜品,请添加套餐");
+        }
+        List<SetmealDish> setmealDishes = setmealDto.getSetmealDishes();
+        Long setmealId = setmealDto.getId();
+
+        LambdaQueryWrapper<SetmealDish> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SetmealDish::getSetmealId,setmealId);
+        setmealDishService.remove(queryWrapper);
+
+        //为setmeal_dish表填充相关的属性
+        for (SetmealDish setmealDish : setmealDishes) {
+            setmealDish.setSetmealId(setmealId);
+        }
+        //批量把setmealDish保存到setmeal_dish表
+        setmealDishService.saveBatch(setmealDishes);
+        setmealService.updateById(setmealDto);
+
+        return R.success("套餐修改成功");
+    }
+
+    @GetMapping("/dish/{id}")
+    public R<List<DishDto>> dish(@PathVariable("id") Long SetmealId){
+        LambdaQueryWrapper<SetmealDish> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SetmealDish::getSetmealId,SetmealId);
+        //获取套餐里面的所有菜品，这个就是SetmealDish表里面的数据
+        List<SetmealDish> setmealDishList = setmealDishService.list(queryWrapper);
+        List<DishDto> dishDtoList = setmealDishList.stream().map((setmealDish -> {
+            DishDto dishDto = new DishDto();
+            //其实这个BeanUtils的拷贝是浅拷贝
+            BeanUtils.copyProperties(setmealDish, dishDto);
+            //这里是为了把套餐中的菜品的基本信息填充到dto中，比如菜品描述，菜品图片等菜品的基本信息
+            Long dishId = setmealDish.getDishId();
+            Dish dish = dishService.getById(dishId);
+            BeanUtils.copyProperties(dish, dishDto);
+            return dishDto;
+        })).collect(Collectors.toList());
+
+        return R.success(dishDtoList);
     }
 }
