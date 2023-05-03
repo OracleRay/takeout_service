@@ -40,6 +40,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Orders> implement
      * @param orders
      */
     @Transactional
+    @Override
     public void submit(Orders orders) {
         //获得当前用户id
         Long userId = BaseContext.getCurrentId();
@@ -52,7 +53,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Orders> implement
         if(shoppingCarts == null || shoppingCarts.size() == 0){
             throw new CustomException("购物车为空，不能下单");
         }
-
         //查询用户数据
         User user = userService.getById(userId);
 
@@ -81,7 +81,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Orders> implement
             return orderDetail;
         }).collect(Collectors.toList());
 
-
         orders.setId(orderId);
         orders.setOrderTime(LocalDateTime.now());
         orders.setCheckoutTime(LocalDateTime.now());
@@ -96,6 +95,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Orders> implement
                 + (addressBook.getCityName() == null ? "" : addressBook.getCityName())
                 + (addressBook.getDistrictName() == null ? "" : addressBook.getDistrictName())
                 + (addressBook.getDetail() == null ? "" : addressBook.getDetail()));
+
         //向订单表插入数据，一条数据
         this.save(orders);
 
