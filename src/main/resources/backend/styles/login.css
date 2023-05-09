@@ -4,6 +4,7 @@
   align-items: center;
   height: 100%;
   background-color: #333;
+  background-image: url("../images/img_denglu_bj.jpg");
 }
 .login-box {
   width: 1000px;
